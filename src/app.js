@@ -1,93 +1,29 @@
-class IndecesionApp extends React.Component {
-    render() {
-        const title = 'Indecision App';
-        const subtitile = 'Put you life in the hands of computer';
-        const options = ['Thing one', 'Thing two', 'Thing four'];
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import AppRouter from './routers/AppRouter';
+import configureStore from './store/configureStore';
+import { addExpense } from './actions/expenses';
+import { setTextFilter } from './actions/filters';
+import getVisibleExpenses from './selectors/expenses';
+import 'normalize.css/normalize.css';
+import './styles/styles.scss';
 
-        return (
-            <div>
-                <Header title={title} subtitile={subtitile} />
-                <Action />
-                <Options options={options}/>
-                <AddOption />
-            </div>
-        );
-    }
-} 
+const store = configureStore();
 
-class Header extends React.Component {
-    render() {
-        return (
-            <div>
-                <h1>{this.props.title}</h1>
-                <p>{this.props.subtitile}</p>
-            </div>
-        );
-    }
-}
+store.dispatch(addExpense({ description: 'water bill', amount: 4500}));
+store.dispatch(addExpense({ description: 'gas bill', createdAt: 1000}));
+store.dispatch(addExpense({ description: 'rent bill', amount: 109500}));
 
-class Action extends React.Component {
-    handlePick() {
-        alert('Button was clicked')
-    }
+const state = store.getState();
+const visibleExpenses = getVisibleExpenses(state.expenses, state.filters);
+console.log(visibleExpenses);
 
-    render() {
-        return (
-            <div>
-                <button onClick={this.handlePick}>What should I do?</button>
-            </div>
-        );
-    }
-}
+const jsx = (
+    <Provider store={store}>
+        <AppRouter />
+    </Provider>
+);
 
-class Options extends React.Component {
-    handleRemoveAll() {
-        alert('Hanlde remove all');
-    }
-    
-    render() {
-        return (
-            <div>
-                <button onClick={this.handleRemoveAll}>RemoveAll</button>
-                {
-                    this.props.options.map((option) => <Option key={option} optionText={option}/>)
-                }
-            </div>
-        );
-    }
-}
+ReactDOM.render(jsx, document.getElementById('app'));
 
-class Option extends React.Component {
-    render() {
-        return (
-            <div>
-                {this.props.optionText}
-            </div>
-        );
-    }
-}
-
-class AddOption extends React.Component {
-    handleAddOption(e) {
-        e.preventDefault();
-        const option = e.target.elements.option.value.trim();
-        if(option) {
-            alert(option)
-        }
-    }
-
-    render() {
-        return (
-            <div>
-                <form onSubmit={this.handleAddOption}>
-                    <input type="text" name="option"></input>
-                    <button>Add Option</button>
-                </form>
-            </div>
-        );
-    }
-}
-
-const appRoot = document.getElementById('app');
-
-ReactDOM.render(<IndecesionApp />, appRoot);
